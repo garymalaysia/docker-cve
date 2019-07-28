@@ -1,0 +1,41 @@
+listeners:
+- name: listener_0
+  address:
+    socket_address: { address: 0.0.0.0, port_value: 80 }
+  filter_chains:
+  - filters:
+    - name: envoy.http_connection_manager
+      typed_config:
+        "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
+        stat_prefix: ingress_http
+        codec_type: AUTO
+        route_config:
+          name: local_route
+          virtual_hosts:
+          - name: local_service
+            domains: ["*"]
+            routes:
+            - match: { prefix: "/" }
+              route: { host_rewrite: 127.0.0.1, prefix_rewrite: "/", cluster: webapp }
+        http_filters:
+        - name: envoy.router
+          typed_config: {}
+
+  clusters:
+  - name: webapp
+    connect_timeout: 0.25s
+    type: strict_dns
+    # Comment out the following line to test on v6 networks
+    # dns_lookup_family: V4_ONLY
+    lb_policy: ROUND_ROBIN
+    load_assignment:
+      cluster_name: webapp
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: webapp1
+                port_value: 80
+    # tls_context:
+    #   sni: www.google.com

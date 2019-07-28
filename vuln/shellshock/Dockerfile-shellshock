@@ -1,0 +1,4 @@
+FROM vulnerables/cve-2014-6271:latest
+
+# CTF
+RUN echo "SXMgeW91ciBuYW1lIEdvb2dsZT8gQmVjYXVzZSB5b3UgaGF2ZSBldmVyeXRoaW5nIEkndmUgYmVlbiBzZWFyY2hpbmcgZm9yLiA=" > /usr/lib/flag.txt

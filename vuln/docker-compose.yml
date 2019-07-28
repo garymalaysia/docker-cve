@@ -1,0 +1,74 @@
+version: "3"
+
+networks:
+  envoymesh: {}
+
+services:
+  # proxy1:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-envoy
+  #   volumes:
+  #     - ./envoy.yaml:/etc/envoy/envoy.yaml
+  #   networks:
+  #     - envoymesh
+  #   expose:
+  #     - "80"
+  #     - "8080"
+  #   ports:
+  #     - "8080:80"
+
+  webapp1:
+    build:
+      context: .
+      dockerfile: ./shellshock/Dockerfile-shellshock
+    networks:
+      envoymesh:
+        aliases:
+          - webapp1
+    expose:
+      - "80"
+    ports:
+      - "127.0.0.1:8080:80"
+
+  webapp2:
+    build:
+      context: .
+      dockerfile: ./shellshock/Dockerfile-shellshock
+    networks:
+      envoymesh:
+        aliases:
+          - webapp1
+    expose:
+      - "80"
+    ports:
+      - "127.0.0.1:9080:80"
+
+  openssl1:
+    build:
+      context: .
+      dockerfile: ./heartbleed/Dockerfile-heartbleed
+    expose:
+      - "8443"
+    ports:
+      - "127.0.0.1:8443:443"
+    
+  openssl2:
+    build:
+      context: .
+      dockerfile: ./heartbleed/Dockerfile-heartbleed
+    expose:
+      - "9443"
+    ports:
+      - "127.0.0.1:9443:443"
+
+
+
+
+ # echo "
+ # rdr pass inet proto tcp from any to any port 8080 -> 127.0.0.1 port 8080
+ #  rdr pass inet proto tcp from any to any port 9080 -> 127.0.0.1 port 9080 
+ # rdr pass inet proto tcp from any to any port 8443 -> 127.0.0.1 port 8443 
+ # rdr pass inet proto tcp from any to any port 9443 -> 127.0.0.1 port 9443 " | sudo pfctl -ef -
+
+      
